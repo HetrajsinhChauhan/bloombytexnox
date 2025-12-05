@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom & Basket | Luxury Florals & Events</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soft-pink': '#fff0f3',
+                        'deep-rose': '#e11d48',
+                        'sage': '#e2e8f0',
+                        'sage-dark': '#475569',
+                        'gold': '#d4af37',
+                        'cream': '#fdfbf7',
+                        'charcoal': '#1f2937'
+                    },
+                    fontFamily: {
+                        sans: ['Lato', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    backgroundImage: {
+                        'pattern-dots': "radial-gradient(#e11d48 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdfbf7;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Loader Styles */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background-color: #fff0f3;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .flower-loader {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .petal {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fda4af;
+            border-radius: 50% 50% 0 50%;
+            transform-origin: bottom right;
+            opacity: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff0f3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fb7185;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+            animation: float 7s ease-in-out infinite 1s;
+        }
+
+        /* Image Hover Zoom */
+        .img-zoom-container {
+            overflow: hidden;
+        }
+        .img-zoom-container img {
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .group:hover .img-zoom-container img {
+            transform: scale(1.1);
+        }
+
+        /* Marquee Text */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body class="text-sage-dark antialiased">
+
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="flower-loader mb-4">
+            <div class="petal p1" style="transform: rotate(0deg) translate(-15px, -15px);"></div>
+            <div class="petal p2" style="transform: rotate(60deg) translate(-15px, -15px);"></div>
+            <div class="petal p3" style="transform: rotate(120deg) translate(-15px, -15px);"></div>
+            <div class="petal p4" style="transform: rotate(180deg) translate(-15px, -15px);"></div>
+            <div class="petal p5" style="transform: rotate(240deg) translate(-15px, -15px);"></div>
+            <div class="petal p6" style="transform: rotate(300deg) translate(-15px, -15px);"></div>
+            <div class="center-bud absolute inset-0 m-auto w-4 h-4 bg-yellow-400 rounded-full z-10 opacity-0"></div>
+        </div>
+        <h2 class="font-serif text-2xl text-rose-800 tracking-widest opacity-0 loader-text">BLOOM & BASKET</h2>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2">
+                <i class="ph-fill ph-flower-lotus text-rose-500"></i>
+                Bloom
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8 font-sans text-xs font-bold tracking-widest uppercase text-gray-600">
+                <a href="#about" class="hover:text-rose-500 transition-colors">Our Story</a>
+                <a href="shops.html " class="hover:text-rose-500 transition-colors">Shop</a>
+                <a href="#weddings" class="hover:text-rose-500 transition-colors">Weddings</a>
+                <a href="#hampers" class="hover:text-rose-500 transition-colors">Hampers</a>
+                <a href="#journal" class="hover:text-rose-500 transition-colors">Journal</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="hover:text-rose-500 transition-colors"><i class="ph ph-magnifying-glass text-xl"></i></button>
+                <button class="relative hover:text-rose-500 transition-colors">
+                    <i class="ph ph-shopping-bag text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">2</span>
+                </button>
+                <button class="md:hidden text-2xl"><i class="ph ph-list"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative min-h-screen pt-20 flex items-center overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float-delayed"></div>
+
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="hero-content space-y-6">
+                <span class="inline-block px-3 py-1 bg-white border border-rose-200 text-rose-800 text-xs tracking-widest uppercase rounded-full">New Season Collection</span>
+                <h1 class="text-5xl md:text-7xl font-serif text-gray-900 leading-[1.1]">
+                    Curating Nature's <br>
+                    <span class="text-rose-500 italic">Finest Moments</span>
+                </h1>
+                <p class="text-lg text-gray-600 max-w-md">
+                    Handcrafted bouquets and artisanal hampers designed to make every occasion unforgettable. Fresh, fragrant, and full of love.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <a href="#collections" class="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-rose-600 transition-colors duration-300 uppercase text-xs tracking-wider">Shop Flowers</a>
+                    <a href="#weddings" class="bg-white border border-gray-900 text-gray-900 px-8 py-3 rounded-full hover:bg-gray-50 transition-colors duration-300 uppercase text-xs tracking-wider">Plan Event</a>
+                </div>
+                
+                <div class="pt-8 flex gap-8 border-t border-gray-200 mt-8">
+                    <div>
+                        <p class="text-2xl font-serif text-gray-900">12k+</p>
+                        <p class="text-xs uppercase text-gray-500 tracking-wider">Deliveries</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-serif text-gray-900">100%</p>
+                        <p class="text-xs uppercase text-gray-500 tracking-wider">Freshness</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-serif text-gray-900">4.9</p>
+                        <p class="text-xs uppercase text-gray-500 tracking-wider">Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-images relative hidden md:block h-[600px]">
+                <div class="absolute right-10 top-10 w-72 h-96 rounded-t-[100px] rounded-b-[20px] overflow-hidden shadow-2xl animate-float">
+                    <img src="https://images.unsplash.com/photo-1562690868-60bbe7293e94?q=80&w=2128&auto=format&fit=crop" alt="Rose Bouquet" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute left-10 bottom-20 w-64 h-80 rounded-full overflow-hidden shadow-2xl animate-float-delayed border-4 border-white">
+                    <img src="https://images.unsplash.com/photo-1582794543139-8ac92a9abf39?q=80&w=2071&auto=format&fit=crop" alt="Tulips" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute right-0 bottom-40 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-lg animate-float">
+                    <p class="font-serif text-lg">Velvet Rose Edit</p>
+                    <p class="text-rose-600 font-bold">$89.00</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NEW: ABOUT US SECTION -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="relative fade-in-section">
+                    <div class="absolute -top-4 -left-4 w-full h-full border-2 border-rose-200 rounded-3xl z-0"></div>
+                    <img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=2000&auto=format&fit=crop" class="relative z-10 rounded-3xl shadow-xl w-full h-[500px] object-cover" alt="Florist at work">
+                </div>
+                <div class="fade-in-section">
+                    <h3 class="text-rose-500 font-bold uppercase tracking-widest text-sm mb-2">Our Philosophy</h3>
+                    <h2 class="text-4xl font-serif text-gray-900 mb-6">Rooted in Passion, <br> Blooming with Love</h2>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Bloom & Basket began with a simple idea: that flowers are not just decorations, but a language of emotion. From a small garden shed to a premier boutique, we have remained dedicated to sourcing the freshest stems and creating arrangements that tell a story.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-8">
+                        Whether it's a single stem to say "I'm sorry" or a grand arch for your wedding day, we pour our hearts into every petal.
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1000&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover" alt="Founder">
+                        <div>
+                            <p class="font-serif font-bold text-gray-900">Sarah Jenkins</p>
+                            <p class="text-xs text-rose-500 uppercase tracking-wide">Lead Florist & Founder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MARQUEE DIVIDER -->
+    <div class="bg-rose-500 py-4 text-white font-serif italic text-2xl overflow-hidden">
+        <div class="marquee-container">
+            <div class="marquee-content">
+                Fresh Blooms &nbsp; • &nbsp; Same Day Delivery &nbsp; • &nbsp; Luxury Hampers &nbsp; • &nbsp; Wedding Styling &nbsp; • &nbsp; Corporate Events &nbsp; • &nbsp; Fresh Blooms &nbsp; • &nbsp; Same Day Delivery &nbsp; • &nbsp; Luxury Hampers &nbsp; • &nbsp; Wedding Styling &nbsp; • &nbsp; Corporate Events &nbsp; • &nbsp;
+            </div>
+        </div>
+    </div>
+
+    <!-- COLLECTIONS -->
+    <section id="collections" class="py-24 bg-cream relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 max-w-2xl mx-auto fade-in-section">
+                <h2 class="text-3xl md:text-4xl font-serif mb-4">Signature Bouquets</h2>
+                <div class="w-20 h-1 bg-rose-300 mx-auto"></div>
+                <p class="mt-4 text-gray-600">From romantic roses to cheerful sunflowers, our arrangements are styled to perfection.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Product Card 1 -->
+                <div class="group cursor-pointer fade-in-section">
+                    <div class="relative overflow-hidden rounded-2xl h-[400px] img-zoom-container">
+                        <img src="https://images.unsplash.com/photo-1591886960571-74d43a9d4166?q=80&w=1974&auto=format&fit=crop" alt="Pastel Dream" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-white/90 px-3 py-1 text-xs uppercase tracking-wide rounded-sm font-bold text-gray-800">Best Seller</div>
+                        <button class="absolute bottom-4 right-4 bg-white text-gray-900 w-12 h-12 rounded-full flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:bg-rose-500 hover:text-white">
+                            <i class="ph-bold ph-plus"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-serif group-hover:text-rose-600 transition-colors">Pastel Dream</h3>
+                            <p class="text-sm text-gray-500">Peonies, Roses, Hydrangeas</p>
+                        </div>
+                        <span class="text-lg font-bold text-gray-900">$65.00</span>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="group cursor-pointer fade-in-section" style="transition-delay: 0.1s;">
+                    <div class="relative overflow-hidden rounded-2xl h-[400px] img-zoom-container">
+                        <img src="https://images.unsplash.com/photo-1596541603527-2c5e538d5865?q=80&w=1974&auto=format&fit=crop" alt="Autumn Whisper" class="w-full h-full object-cover">
+                        <button class="absolute bottom-4 right-4 bg-white text-gray-900 w-12 h-12 rounded-full flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:bg-rose-500 hover:text-white">
+                            <i class="ph-bold ph-plus"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-serif group-hover:text-rose-600 transition-colors">Autumn Whisper</h3>
+                            <p class="text-sm text-gray-500">Dried florals, Cotton, Eucalyptus</p>
+                        </div>
+                        <span class="text-lg font-bold text-gray-900">$55.00</span>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="group cursor-pointer fade-in-section" style="transition-delay: 0.2s;">
+                    <div class="relative overflow-hidden rounded-2xl h-[400px] img-zoom-container">
+                        <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=1974&auto=format&fit=crop" alt="Ruby Romance" class="w-full h-full object-cover">
+                        <button class="absolute bottom-4 right-4 bg-white text-gray-900 w-12 h-12 rounded-full flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:bg-rose-500 hover:text-white">
+                            <i class="ph-bold ph-plus"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-serif group-hover:text-rose-600 transition-colors">Ruby Romance</h3>
+                            <p class="text-sm text-gray-500">Red Roses, Baby's Breath</p>
+                        </div>
+                        <span class="text-lg font-bold text-gray-900">$85.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="shops.html" class="inline-block border border-gray-900 text-gray-900 px-8 py-3 rounded-full hover:bg-gray-900 hover:text-white transition-colors uppercase text-xs tracking-widest font-bold">View All Collections</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: PROCESS SECTION -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="fade-in-section p-6 rounded-2xl hover:bg-soft-pink transition-colors duration-500">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-500 text-3xl">
+                        <i class="ph-fill ph-plant"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">1. Locally Sourced</h3>
+                    <p class="text-gray-600 text-sm">We partner with local growers to ensure every stem is cut at the peak of freshness.</p>
+                </div>
+                <div class="fade-in-section p-6 rounded-2xl hover:bg-soft-pink transition-colors duration-500" style="transition-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-500 text-3xl">
+                        <i class="ph-fill ph-paint-brush"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">2. Artfully Arranged</h3>
+                    <p class="text-gray-600 text-sm">Our expert florists treat every bouquet like a canvas, balancing color and texture.</p>
+                </div>
+                <div class="fade-in-section p-6 rounded-2xl hover:bg-soft-pink transition-colors duration-500" style="transition-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-500 text-3xl">
+                        <i class="ph-fill ph-truck"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">3. Delivered with Care</h3>
+                    <p class="text-gray-600 text-sm">Hand-delivered to your doorstep in our signature sustainable packaging.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: WEDDINGS SECTION -->
+    <section id="weddings" class="relative py-24 bg-stone-900 text-white overflow-hidden">
+        <div class="absolute inset-0 opacity-40">
+            <img src="https://images.unsplash.com/photo-1519225421980-715cb0202128?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover grayscale" alt="Wedding Background">
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="fade-in-left">
+                    <span class="text-rose-400 font-bold uppercase tracking-widest text-sm mb-2 block">Events & Weddings</span>
+                    <h2 class="text-4xl md:text-6xl font-serif mb-6 leading-tight">Your Big Day, <br> Beautifully Bloomed.</h2>
+                    <p class="text-gray-300 mb-8 leading-relaxed max-w-lg">
+                        We specialize in creating bespoke floral designs for weddings and intimate events. From the bridal bouquet to the table centerpieces, we ensure every detail reflects your unique style and love story.
+                    </p>
+                    <a href="#" class="inline-block bg-white text-gray-900 px-8 py-3 rounded-full hover:bg-rose-500 hover:text-white transition-colors uppercase text-xs tracking-widest font-bold">Book Consultation</a>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 fade-in-right">
+                    <div class="space-y-4 translate-y-8">
+                        <img src="https://images.unsplash.com/photo-1522338661661-d70081d59646?q=80&w=1000&auto=format&fit=crop" class="rounded-lg opacity-90 hover:opacity-100 transition-opacity" alt="Wedding 1">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg border border-white/20">
+                            <i class="ph-fill ph-star text-rose-400 text-xl mb-2"></i>
+                            <p class="text-sm italic">"The arch was breathtaking. It transformed the venue completely."</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg border border-white/20">
+                            <h4 class="font-serif text-lg text-rose-400">Services</h4>
+                            <ul class="text-xs space-y-2 mt-2 text-gray-300">
+                                <li>• Bridal Bouquets</li>
+                                <li>• Venue Installations</li>
+                                <li>• Table Styling</li>
+                                <li>• Buttonholes</li>
+                            </ul>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1520295834884-25244b7f730c?q=80&w=1000&auto=format&fit=crop" class="rounded-lg opacity-90 hover:opacity-100 transition-opacity" alt="Wedding 2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LUXURY HAMPERS SECTION -->
+    <section id="hampers" class="py-24 bg-soft-pink relative overflow-hidden">
+        <div class="absolute -left-20 top-20 text-rose-200 opacity-20 text-[20rem] font-serif leading-none select-none">Gift</div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="w-full md:w-1/2 fade-in-left">
+                    <span class="text-rose-500 text-sm font-bold tracking-widest uppercase mb-2 block">Curated Gift Boxes</span>
+                    <h2 class="text-4xl md:text-5xl font-serif mb-6 text-gray-900">The Art of Gifting</h2>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        Beyond flowers, we create experiences. Our luxury hampers combine premium chocolates, fine wines, scented candles, and our signature blooms. Perfect for corporate gifting or spoiling a loved one.
+                    </p>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="ph-fill ph-check-circle text-rose-500 text-xl"></i>
+                            <span class="text-gray-700">Premium Swiss Chocolates</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="ph-fill ph-check-circle text-rose-500 text-xl"></i>
+                            <span class="text-gray-700">Hand-poured Soy Candles</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="ph-fill ph-check-circle text-rose-500 text-xl"></i>
+                            <span class="text-gray-700">Sustainable Packaging</span>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="inline-block border-b-2 border-gray-900 pb-1 text-gray-900 hover:text-rose-600 hover:border-rose-600 transition-all font-bold uppercase text-xs tracking-widest">Explore Hampers</a>
+                </div>
+
+                <div class="w-full md:w-1/2 relative h-[500px]">
+                    <div class="absolute inset-0 bg-white/30 rounded-full blur-3xl transform scale-75"></div>
+                    <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=2040&auto=format&fit=crop" class="relative z-10 w-full h-full object-cover rounded-t-full rounded-b-2xl shadow-2xl fade-in-right" alt="Luxury Hamper">
+                    
+                    <div class="absolute -left-6 bottom-10 glass-card p-6 rounded-xl max-w-xs z-20 hidden md:block fade-in-right" style="transition-delay: 0.2s">
+                        <div class="flex items-center gap-4 mb-3">
+                            <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=2115&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover" alt="User">
+                            <div>
+                                <p class="text-sm font-bold">"Best gift ever!"</p>
+                                <div class="flex text-yellow-400 text-xs">
+                                    <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 italic">"The Self-Care hamper was exquisite. The flowers lasted for weeks and the candle smells divine."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: TESTIMONIALS -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <span class="text-rose-500 text-sm font-bold tracking-widest uppercase mb-2 block">Love Notes</span>
+            <h2 class="text-3xl md:text-4xl font-serif mb-12">What Our Clients Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 bg-cream rounded-2xl border border-rose-100 fade-in-section">
+                    <div class="text-rose-400 text-4xl mb-4">"</div>
+                    <p class="text-gray-600 italic mb-6">"I ordered a bouquet for my mother's birthday and she was in tears. The arrangement was absolutely stunning and smelled heavenly."</p>
+                    <p class="font-serif font-bold text-gray-900">- Emily R.</p>
+                </div>
+                <div class="p-8 bg-cream rounded-2xl border border-rose-100 fade-in-section" style="transition-delay: 0.1s;">
+                    <div class="text-rose-400 text-4xl mb-4">"</div>
+                    <p class="text-gray-600 italic mb-6">"Bloom & Basket handled the flowers for our corporate gala. Professional, timely, and the designs were the talk of the night."</p>
+                    <p class="font-serif font-bold text-gray-900">- Michael T.</p>
+                </div>
+                <div class="p-8 bg-cream rounded-2xl border border-rose-100 fade-in-section" style="transition-delay: 0.2s;">
+                    <div class="text-rose-400 text-4xl mb-4">"</div>
+                    <p class="text-gray-600 italic mb-6">"The 'Calm' hamper is my go-to gift for friends. The presentation is luxury personified. Highly recommend."</p>
+                    <p class="font-serif font-bold text-gray-900">- Sarah K.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: INSTAGRAM JOURNAL -->
+    <section id="journal" class="py-12 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 mb-8 flex justify-between items-end">
+            <div>
+                <h2 class="text-2xl font-serif">The Floral Journal</h2>
+                <p class="text-gray-500 text-sm">Follow us @bloomandbasket</p>
+            </div>
+            <a href="#" class="text-sm font-bold uppercase tracking-widest text-rose-500 hover:text-rose-700">See Gallery <i class="ph-bold ph-arrow-right"></i></a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div class="aspect-square overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1599598425947-36c53b27b876?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Insta 1">
+            </div>
+            <div class="aspect-square overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1464695110811-dcf3903dc2f4?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Insta 2">
+            </div>
+            <div class="aspect-square overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1455582916367-25f75bfc6710?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Insta 3">
+            </div>
+            <div class="aspect-square overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1520302630591-a6e3b0db2912?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Insta 4">
+            </div>
+            <div class="aspect-square overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1563241527-3004b7be0eee?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Insta 5">
+            </div>
+        </div>
+    </section>
+
+    <!-- BANNER / CTA -->
+    <section class="py-24 relative bg-gray-900 text-white overflow-hidden">
+        <div class="absolute inset-0 opacity-40">
+            <img src="https://images.unsplash.com/photo-1507290439931-a861b5a38200?q=80&w=2232&auto=format&fit=crop" class="w-full h-full object-cover" alt="Dark Floral Background">
+        </div>
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+            <h2 class="text-4xl md:text-6xl font-serif mb-6">Create Your Custom Arrangement</h2>
+            <p class="text-gray-300 mb-8 text-lg">Have a specific vision? Work with our florists to bring your dream bouquet to life.</p>
+            <button class="bg-rose-500 hover:bg-rose-600 text-white px-10 py-4 rounded-full transition-all transform hover:scale-105 shadow-lg uppercase tracking-widest text-sm font-bold">Start Designing</button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-50 pt-16 pb-8 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <a href="#" class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2 mb-6">
+                    <i class="ph-fill ph-flower-lotus text-rose-500"></i>
+                    Bloom
+                </a>
+                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                    Bringing nature's beauty to your doorstep. We specialize in ethically sourced flowers and curated luxury hampers.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-rose-500 hover:text-white transition-all"><i class="ph-fill ph-instagram-logo"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition-all"><i class="ph-fill ph-facebook-logo"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-all"><i class="ph-fill ph-tiktok-logo"></i></a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Quick Links</h4>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Shop All</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Wedding Florals</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Corporate Gifts</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Care Guide</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">FAQs</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Contact</h4>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-center gap-2"><i class="ph ph-map-pin"></i> 123 Blossom Ave, FL 32000</li>
+                    <li class="flex items-center gap-2"><i class="ph ph-phone"></i> +1 (555) 123-4567</li>
+                    <li class="flex items-center gap-2"><i class="ph ph-envelope"></i> hello@bloomandbasket.com</li>
+                    <li class="flex items-center gap-2"><i class="ph ph-clock"></i> Mon - Sat: 9am - 6pm</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Newsletter</h4>
+                <p class="text-xs text-gray-500 mb-4">Subscribe for latest designs and offers.</p>
+                <div class="flex">
+                    <input type="email" placeholder="Email Address" class="bg-white border border-gray-300 px-4 py-2 w-full text-sm focus:outline-none focus:border-rose-500 rounded-l-md">
+                    <button class="bg-gray-900 text-white px-4 py-2 text-sm rounded-r-md hover:bg-rose-600 transition-colors">Join</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-200 text-center text-xs text-gray-400">
+            &copy; 2023 Bloom & Basket. Designed with <i class="ph-fill ph-heart text-rose-500"></i> by YourName.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT ANIMATIONS -->
+    <script>
+        // Register GSAP Plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Loader Animation Sequence ---
+        const tlLoader = gsap.timeline();
+
+        // Animate petals opening like a flower
+        tlLoader.to(".petal", {
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1
+        })
+        .to(".petal", {
+            rotation: (i) => i * 60,
+            x: 0,
+            y: 0,
+            duration: 1.5,
+            ease: "elastic.out(1, 0.5)"
+        }, "-=0.2")
+        .to(".center-bud", {
+            opacity: 1,
+            scale: 1.2,
+            duration: 0.5
+        }, "-=1")
+        .to(".loader-text", {
+            opacity: 1,
+            y: -10,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.5")
+        .to("#loader", {
+            yPercent: -100,
+            duration: 1,
+            ease: "power4.inOut",
+            delay: 0.5
+        });
+
+        // --- Site Animations (Runs after loader) ---
+        tlLoader.then(() => {
+            // Hero Text Animation
+            gsap.from(".hero-content > *", {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+
+            // Hero Image Reveal
+            gsap.from(".hero-images > div", {
+                scale: 0.8,
+                opacity: 0,
+                duration: 1.5,
+                stagger: 0.3,
+                ease: "power3.out"
+            });
+        });
+
+        // --- Scroll Trigger Animations ---
+
+        // Fade Up Sections
+        gsap.utils.toArray('.fade-in-section').forEach(element => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Left Slide In
+        gsap.utils.toArray('.fade-in-left').forEach(element => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 70%"
+                },
+                x: -50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Right Slide In
+        gsap.utils.toArray('.fade-in-right').forEach(element => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 70%"
+                },
+                x: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+        });
+
+        // Navbar Blur on Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'py-2');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.remove('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'py-2');
+                nav.classList.add('py-4');
+            }
+        });
+
+        // Add Petal Rain Effect (Subtle background)
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('fixed', 'pointer-events-none', 'z-0');
+            // Random styling
+            const size = Math.random() * 10 + 5;
+            petal.style.width = `${size}px`;
+            petal.style.height = `${size}px`;
+            petal.style.backgroundColor = Math.random() > 0.5 ? '#fff0f3' : '#ffe4e6';
+            petal.style.borderRadius = '50% 0 50% 50%';
+            petal.style.left = `${Math.random() * 100}vw`;
+            petal.style.top = '-20px';
+            petal.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            document.body.appendChild(petal);
+
+            // Animate fall
+            gsap.to(petal, {
+                y: '100vh',
+                x: `+=${Math.random() * 100 - 50}`,
+                rotation: Math.random() * 360,
+                duration: Math.random() * 5 + 5,
+                ease: 'linear',
+                onComplete: () => petal.remove()
+            });
+        }
+
+        // Create petals occasionally
+        setInterval(createPetal, 2000);
+
+    </script>
+</body>
+</html>

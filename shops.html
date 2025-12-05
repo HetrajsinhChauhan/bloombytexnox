@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom & Basket | Shop Collection</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soft-pink': '#fff0f3',
+                        'deep-rose': '#e11d48',
+                        'sage': '#e2e8f0',
+                        'sage-dark': '#475569',
+                        'gold': '#d4af37',
+                        'cream': '#fdfbf7',
+                        'charcoal': '#1f2937'
+                    },
+                    fontFamily: {
+                        sans: ['Lato', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdfbf7;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Loader Styles */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background-color: #fff0f3;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .flower-loader {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .petal {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fda4af;
+            border-radius: 50% 50% 0 50%;
+            transform-origin: bottom right;
+            opacity: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #fff0f3;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fb7185;
+            border-radius: 4px;
+        }
+
+        /* Image Hover Zoom */
+        .img-zoom-container {
+            overflow: hidden;
+        }
+
+        .img-zoom-container img {
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .group:hover .img-zoom-container img {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body class="text-sage-dark antialiased">
+
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="flower-loader mb-4">
+            <div class="petal p1" style="transform: rotate(0deg) translate(-15px, -15px);"></div>
+            <div class="petal p2" style="transform: rotate(60deg) translate(-15px, -15px);"></div>
+            <div class="petal p3" style="transform: rotate(120deg) translate(-15px, -15px);"></div>
+            <div class="petal p4" style="transform: rotate(180deg) translate(-15px, -15px);"></div>
+            <div class="petal p5" style="transform: rotate(240deg) translate(-15px, -15px);"></div>
+            <div class="petal p6" style="transform: rotate(300deg) translate(-15px, -15px);"></div>
+            <div class="center-bud absolute inset-0 m-auto w-4 h-4 bg-yellow-400 rounded-full z-10 opacity-0"></div>
+        </div>
+        <h2 class="font-serif text-2xl text-rose-800 tracking-widest opacity-0 loader-text">BLOOM & BASKET</h2>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2">
+                <i class="ph-fill ph-flower-lotus text-rose-500"></i>
+                Bloom
+            </a>
+
+            <div
+                class="hidden md:flex items-center gap-8 font-sans text-xs font-bold tracking-widest uppercase text-gray-600">
+                <a href="index.html" class="hover:text-rose-500 transition-colors">Home</a>
+
+                <button onclick="filterProducts('all')" class="hover:text-rose-500 transition-colors">All
+                    Collection</button>
+                <button onclick="filterProducts('bouquet')"
+                    class="hover:text-rose-500 transition-colors">Bouquets</button>
+                <button onclick="filterProducts('hamper')"
+                    class="hover:text-rose-500 transition-colors">Hampers</button>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="hover:text-rose-500 transition-colors"><i
+                        class="ph ph-magnifying-glass text-xl"></i></button>
+                <button class="relative hover:text-rose-500 transition-colors group">
+                    <i class="ph ph-shopping-bag text-xl"></i>
+                    <span id="cart-count"
+                        class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">2</span>
+                </button>
+                <button class="md:hidden text-2xl"><i class="ph ph-list"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SHOP HEADER -->
+    <header class="bg-soft-pink pt-32 pb-16 text-center relative overflow-hidden">
+        <div
+            class="absolute top-0 right-0 w-96 h-96 bg-white/40 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-64 h-64 bg-rose-200/30 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2">
+        </div>
+
+        <div class="relative z-10 px-6">
+            <h1 class="text-4xl md:text-6xl font-serif text-gray-900 mb-4 fade-in-up">Our Collection</h1>
+            <p class="text-gray-600 max-w-lg mx-auto fade-in-up" style="animation-delay: 0.1s;">
+                Discover hand-picked blooms and curated hampers for every occasion. Freshness guaranteed.
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN SHOP SECTION -->
+    <main class="min-h-screen bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <!-- Filter Tabs -->
+            <div class="flex justify-center gap-6 mb-12 border-b border-gray-200 pb-4">
+                <button onclick="filterProducts('all')"
+                    class="filter-btn active text-sm font-bold uppercase tracking-widest hover:text-rose-500 transition-colors pb-4 border-b-2 border-transparent hover:border-rose-500 text-rose-600 border-rose-600">All</button>
+                <button onclick="filterProducts('bouquet')"
+                    class="filter-btn text-sm font-bold uppercase tracking-widest hover:text-rose-500 transition-colors pb-4 border-b-2 border-transparent hover:border-rose-500 text-gray-500">Bouquets</button>
+                <button onclick="filterProducts('hamper')"
+                    class="filter-btn text-sm font-bold uppercase tracking-widest hover:text-rose-500 transition-colors pb-4 border-b-2 border-transparent hover:border-rose-500 text-gray-500">Hampers</button>
+            </div>
+
+            <!-- Products Grid Container -->
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <!-- Products will be injected here via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-50 pt-16 pb-8 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <a href="#" class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2 mb-6">
+                    <i class="ph-fill ph-flower-lotus text-rose-500"></i>
+                    Bloom
+                </a>
+                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                    Bringing nature's beauty to your doorstep. We specialize in ethically sourced flowers and curated
+                    luxury hampers.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Help</h4>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Shipping & Delivery</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Care Guide</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">FAQs</a></li>
+                    <li><a href="#" class="hover:text-rose-500 transition-colors">Returns</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Contact</h4>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-center gap-2"><i class="ph ph-map-pin"></i> 123 Blossom Ave, FL 32000</li>
+                    <li class="flex items-center gap-2"><i class="ph ph-phone"></i> +1 (555) 123-4567</li>
+                    <li class="flex items-center gap-2"><i class="ph ph-envelope"></i> hello@bloomandbasket.com</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-lg mb-6">Newsletter</h4>
+                <p class="text-xs text-gray-500 mb-4">Subscribe for latest designs and offers.</p>
+                <div class="flex">
+                    <input type="email" placeholder="Email Address"
+                        class="bg-white border border-gray-300 px-4 py-2 w-full text-sm focus:outline-none focus:border-rose-500 rounded-l-md">
+                    <button
+                        class="bg-gray-900 text-white px-4 py-2 text-sm rounded-r-md hover:bg-rose-600 transition-colors">Join</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-200 text-center text-xs text-gray-400">
+            &copy; 2023 Bloom & Basket. Designed with <i class="ph-fill ph-heart text-rose-500"></i> by YourName.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT ANIMATIONS & LOGIC -->
+    <script>
+        // Register GSAP Plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Loader Animation Sequence ---
+        const tlLoader = gsap.timeline();
+
+        // Animate petals opening like a flower
+        tlLoader.to(".petal", {
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1
+        })
+            .to(".petal", {
+                rotation: (i) => i * 60,
+                x: 0,
+                y: 0,
+                duration: 1.5,
+                ease: "elastic.out(1, 0.5)"
+            }, "-=0.2")
+            .to(".center-bud", {
+                opacity: 1,
+                scale: 1.2,
+                duration: 0.5
+            }, "-=1")
+            .to(".loader-text", {
+                opacity: 1,
+                y: -10,
+                duration: 0.8,
+                ease: "power2.out"
+            }, "-=0.5")
+            .to("#loader", {
+                yPercent: -100,
+                duration: 1,
+                ease: "power4.inOut",
+                delay: 0.5,
+                onComplete: () => {
+                    // Trigger shop animations once loader is gone
+                    renderProducts('all');
+                    gsap.from(".fade-in-up", {
+                        y: 30, opacity: 0, duration: 0.8, stagger: 0.2, ease: "power2.out"
+                    });
+                }
+            });
+
+        // --- SHOP DATA & LOGIC ---
+        const products = [
+            { id: 1, name: "Pastel Dream", price: 65, category: "bouquet", image: "https://images.unsplash.com/photo-1591886960571-74d43a9d4166?q=80&w=1974&auto=format&fit=crop", desc: "Peonies & Hydrangeas" },
+            { id: 2, name: "Autumn Whisper", price: 55, category: "bouquet", image: "https://images.unsplash.com/photo-1596541603527-2c5e538d5865?q=80&w=1974&auto=format&fit=crop", desc: "Dried Florals" },
+            { id: 3, name: "Ruby Romance", price: 85, category: "bouquet", image: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=1974&auto=format&fit=crop", desc: "Classic Red Roses" },
+            { id: 4, name: "Sunshine Bliss", price: 45, category: "bouquet", image: "https://images.unsplash.com/photo-1490750967868-58cb75069faf?q=80&w=2000&auto=format&fit=crop", desc: "Sunflowers & Daisies" },
+            { id: 5, name: "White Elegance", price: 70, category: "bouquet", image: "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?q=80&w=2000&auto=format&fit=crop", desc: "Lilies & Orchids" },
+            { id: 6, name: "Self Care Box", price: 120, category: "hamper", image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=2040&auto=format&fit=crop", desc: "Candle, Wine, Flowers" },
+            { id: 7, name: "Gourmet Treat", price: 95, category: "hamper", image: "https://images.unsplash.com/photo-1588600109289-4089c9220976?q=80&w=2000&auto=format&fit=crop", desc: "Chocolates & Fruits" },
+            { id: 8, name: "Date Night", price: 150, category: "hamper", image: "https://images.unsplash.com/photo-1512909006721-3d6018887383?q=80&w=2000&auto=format&fit=crop", desc: "Champagne & Roses" },
+            { id: 9, name: "Spring Fling", price: 60, category: "bouquet", image: "https://images.unsplash.com/photo-1508610048659-a06b669e3321?q=80&w=2000&auto=format&fit=crop", desc: "Tulips Mix" },
+            { id: 10, name: "Wildflower Mix", price: 50, category: "bouquet", image: "https://images.unsplash.com/photo-1463944686236-40742d4a0f44?q=80&w=2000&auto=format&fit=crop", desc: "Field Flowers" },
+            { id: 11, name: "Luxury Orchid", price: 110, category: "bouquet", image: "https://images.unsplash.com/photo-1566934226993-4a11c251f081?q=80&w=2000&auto=format&fit=crop", desc: "Potted Orchid" },
+            { id: 12, name: "Baby Shower", price: 130, category: "hamper", image: "https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=2000&auto=format&fit=crop", desc: "Toys & Treats" },
+        ];
+
+        function renderProducts(filter) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = ''; // Clear current
+
+            const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "group cursor-pointer";
+                card.innerHTML = `
+                    <div class="relative overflow-hidden rounded-2xl h-[350px] img-zoom-container bg-gray-100">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                        <button onclick="addToCart()" class="absolute bottom-4 right-4 bg-white text-gray-900 w-10 h-10 rounded-full flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:bg-rose-500 hover:text-white">
+                            <i class="ph-bold ph-plus"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-serif group-hover:text-rose-600 transition-colors">${p.name}</h3>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide">${p.desc}</p>
+                        </div>
+                        <span class="text-lg font-bold text-gray-900">$${p.price}.00</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Re-animate new items
+            gsap.from("#product-grid > div", { opacity: 0, y: 20, duration: 0.5, stagger: 0.05 });
+        }
+
+        function filterProducts(cat) {
+            // Update active button state
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('text-rose-600', 'border-rose-600');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+
+            // If triggered by click event, find the button and update classes.
+            // If called manually (like on init), we might skip this visual update or handle it differently.
+            if (event && event.target && event.target.classList.contains('filter-btn')) {
+                event.target.classList.remove('text-gray-500', 'border-transparent');
+                event.target.classList.add('text-rose-600', 'border-rose-600');
+            }
+
+            renderProducts(cat);
+        }
+
+        let cartCount = 2;
+        function addToCart() {
+            cartCount++;
+            const badge = document.getElementById('cart-count');
+            badge.innerText = cartCount;
+
+            // Little bounce animation
+            gsap.fromTo(badge, { scale: 1.5 }, { scale: 1, duration: 0.3, ease: "elastic.out(1, 0.3)" });
+        }
+
+        // Navbar Blur on Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'py-2');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.remove('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'py-2');
+                nav.classList.add('py-4');
+            }
+        });
+
+        // Add Petal Rain Effect
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('fixed', 'pointer-events-none', 'z-0');
+            // Random styling
+            const size = Math.random() * 10 + 5;
+            petal.style.width = `${size}px`;
+            petal.style.height = `${size}px`;
+            petal.style.backgroundColor = Math.random() > 0.5 ? '#fff0f3' : '#ffe4e6';
+            petal.style.borderRadius = '50% 0 50% 50%';
+            petal.style.left = `${Math.random() * 100}vw`;
+            petal.style.top = '-20px';
+            petal.style.opacity = Math.random() * 0.5 + 0.1;
+
+            document.body.appendChild(petal);
+
+            // Animate fall
+            gsap.to(petal, {
+                y: '100vh',
+                x: `+=${Math.random() * 100 - 50}`,
+                rotation: Math.random() * 360,
+                duration: Math.random() * 5 + 5,
+                ease: 'linear',
+                onComplete: () => petal.remove()
+            });
+        }
+        setInterval(createPetal, 2000);
+
+    </script>
+</body>
+
+</html>
