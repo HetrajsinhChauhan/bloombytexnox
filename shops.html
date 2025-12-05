@@ -127,7 +127,7 @@
 
     <!-- NAVIGATION -->
     <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center relative z-50">
             <a href="#" class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2">
                 <i class="ph-fill ph-flower-lotus text-rose-500"></i>
                 Bloom
@@ -136,7 +136,6 @@
             <div
                 class="hidden md:flex items-center gap-8 font-sans text-xs font-bold tracking-widest uppercase text-gray-600">
                 <a href="index.html" class="hover:text-rose-500 transition-colors">Home</a>
-
                 <button onclick="filterProducts('all')" class="hover:text-rose-500 transition-colors">All
                     Collection</button>
                 <button onclick="filterProducts('bouquet')"
@@ -153,11 +152,23 @@
                     <span id="cart-count"
                         class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">2</span>
                 </button>
-                <button class="md:hidden text-2xl"><i class="ph ph-list"></i></button>
+
+                <button onclick="toggleMenu()" id="mobile-menu-btn"
+                    class="md:hidden text-2xl hover:text-rose-500 transition-colors z-50 relative cursor-pointer">
+                    <i class="ph ph-list"></i>
+                </button>
             </div>
         </div>
-    </nav>
 
+        <div id="mobile-menu"
+            class="hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-t border-rose-100 shadow-xl flex-col items-center py-8 space-y-6 md:hidden">
+            <a href="#about" class="text-lg font-serif text-gray-800 hover:text-rose-500">Our Story</a>
+            <a href="shops.html" class="text-lg font-serif text-gray-800 hover:text-rose-500">Shop</a>
+            <a href="#weddings" class="text-lg font-serif text-gray-800 hover:text-rose-500">Weddings</a>
+            <a href="#hampers" class="text-lg font-serif text-gray-800 hover:text-rose-500">Hampers</a>
+            <a href="#journal" class="text-lg font-serif text-gray-800 hover:text-rose-500">Journal</a>
+        </div>
+    </nav> 
     <!-- SHOP HEADER -->
     <header class="bg-soft-pink pt-32 pb-16 text-center relative overflow-hidden">
         <div
@@ -402,6 +413,32 @@
                 ease: 'linear',
                 onComplete: () => petal.remove()
             });
+        }
+
+
+        // --- ROBUST MOBILE MENU LOGIC ---
+        function toggleMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('mobile-menu-btn');
+            // Select the first child (icon) regardless if it is <i> or <svg>
+            const icon = btn.firstElementChild;
+
+            // Toggle visibility
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+
+            // Toggle Icon
+            if (icon) {
+                if (mobileMenu.classList.contains('hidden')) {
+                    // Menu is closed, show LIST icon
+                    icon.classList.remove('ph-x');
+                    icon.classList.add('ph-list');
+                } else {
+                    // Menu is open, show X icon
+                    icon.classList.remove('ph-list');
+                    icon.classList.add('ph-x');
+                }
+            }
         }
         setInterval(createPetal, 2000);
 
